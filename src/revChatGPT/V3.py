@@ -1,14 +1,14 @@
 """
 A simple wrapper for the official ChatGPT API
 """
+
 import argparse
 import json
 import os
 import sys
 from importlib.resources import path
 from pathlib import Path
-from typing import AsyncGenerator
-from typing import NoReturn
+from typing import AsyncGenerator, NoReturn
 
 import httpx
 import requests
@@ -16,11 +16,13 @@ import tiktoken
 
 from . import __version__
 from . import typings as t
-from .utils import create_completer
-from .utils import create_keybindings
-from .utils import create_session
-from .utils import get_filtered_keys_from_object
-from .utils import get_input
+from .utils import (
+    create_completer,
+    create_keybindings,
+    create_session,
+    get_filtered_keys_from_object,
+    get_input,
+)
 
 ENGINES = [
     "gpt-3.5-turbo",
@@ -34,6 +36,8 @@ ENGINES = [
     "gpt-4-32k-0314",
     "gpt-4-0613",
     "gpt-4-32k-0613",
+    "gpt-4-0125-preview",
+    "gpt-4-turbo-preview",
 ]
 
 
@@ -66,20 +70,20 @@ class Chatbot:
         self.max_tokens: int = max_tokens or (
             31000
             if "gpt-4-32k" in engine
-            else 7000
-            if "gpt-4" in engine
-            else 15000
-            if "gpt-3.5-turbo-16k" in engine
-            else 4000
+            else (
+                7000
+                if "gpt-4" in engine
+                else 15000 if "gpt-3.5-turbo-16k" in engine else 4000
+            )
         )
         self.truncate_limit: int = truncate_limit or (
             30500
             if "gpt-4-32k" in engine
-            else 6500
-            if "gpt-4" in engine
-            else 14500
-            if "gpt-3.5-turbo-16k" in engine
-            else 3500
+            else (
+                6500
+                if "gpt-4" in engine
+                else 14500 if "gpt-3.5-turbo-16k" in engine else 3500
+            )
         )
         self.temperature: float = temperature
         self.top_p: float = top_p
